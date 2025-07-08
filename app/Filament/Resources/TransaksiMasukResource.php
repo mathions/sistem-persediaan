@@ -34,23 +34,6 @@ class TransaksiMasukResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected function afterSave(): void
-    {
-        $transaksi = $this->record;
-
-        $barang = Barang::find($transaksi->barang_id);
-
-        if ($barang) {
-            $barang->increment('stok', $transaksi->jumlah);
-
-            Notification::make()
-                ->title('Test')
-                ->body('afterCreate dijalankan')
-                ->success()
-                ->send();
-        }      
-    }
-
     public static function form(Form $form): Form
     {
         return $form

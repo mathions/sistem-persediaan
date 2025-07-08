@@ -17,6 +17,7 @@ class StatusSeeder extends Seeder
             'Diajukan',
             'Direkap',
             'Disetujui',
+            'Ditolak',
         ];
 
         foreach ($statuses as $status) {

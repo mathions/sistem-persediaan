@@ -39,7 +39,6 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Pengajuan',
                 'Rekapitulasi',
-                'Persetujuan',
                 'Kelola Barang',
                 'Transaksi',
             ])

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\StatusPengajuan;
 use App\Filament\Resources\PemakaianResource\Pages;
 use App\Filament\Resources\PemakaianResource\RelationManagers;
 use App\Models\Pemakaian;
@@ -19,8 +20,10 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
+use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\View;
 
 class PemakaianResource extends Resource
 {
@@ -109,20 +112,32 @@ class PemakaianResource extends Resource
                                 // User
                                 Placeholder::make('user')
                                     ->label('Nama')
-                                    ->content(fn ($record) => $record->user?->name),
+                                    ->content(fn ($record) => $record->user?->name)
+                                    ->columnSpan([
+                                        'md' => 3,
+                                    ]),
         
                                 // Nama Pemakaian
                                 Placeholder::make('nama_pemakaian')
                                     ->label('Deskripsi')
-                                    ->content(fn ($record) =>$record->nama_pemakaian),
+                                    ->content(fn ($record) =>$record->nama_pemakaian)
+                                    ->columnSpan([
+                                        'md' => 4,
+                                    ]),
         
                                 // Status
-                                Select::make('status_id')
+                                Placeholder::make('status')
                                     ->label('Status')
-                                    ->relationship('status', 'nama_status') // pastikan relasi ada di model
-                                    ->required(),
+                                    ->content(fn ($record) => match (strtolower($record->status?->nama_status)) {
+                                        'diajukan' => '✨ Diajukan',
+                                        'direkap' => '📄 Direkap',
+                                        'disetujui' => '✅ Disetujui',
+                                        'ditolak' => '❌ Ditolak',
+                                        default => 'Tidak diketahui',
+                                    }),
                             ])
-                            ->columns(3),
+                                ->columns([
+                                    'md' => 10]),
 
                         Forms\Components\Section::make('Daftar Barang')
                             ->schema([
@@ -156,7 +171,8 @@ class PemakaianResource extends Resource
                                     ->columns([
                                         'md' => 10])
                                     ->hiddenLabel()
-                                    ->addable(false),
+                                    ->addable(false)
+                                    ->deletable(false),
                                     ]),
 
                     ])
@@ -177,7 +193,22 @@ class PemakaianResource extends Resource
                     ->searchable()
                     ->label('Deskripsi'),
                 TextColumn::make('status.nama_status')
-                    ->label('Status'),
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($state) => match (strtolower($state)) {
+                        'diajukan' => 'info',
+                        'direkap' => 'warning',
+                        'disetujui' => 'success',
+                        'ditolak' => 'danger',
+                        default => 'secondary',
+                    })
+                    ->icon(fn ($state) => match (strtolower($state)) {
+                        'diajukan' => 'heroicon-m-sparkles',
+                        'direkap' => 'heroicon-m-document-text',
+                        'disetujui' => 'heroicon-m-check-circle',
+                        'ditolak' => 'heroicon-m-x-circle',
+                        default => null,
+                    }),
                 TextColumn::make('created_at')
                     ->label('Tanggal')
                     ->date(),

@@ -115,7 +115,18 @@ class UsulanResource extends Resource
                     ->searchable()
                     ->label('Deskripsi'),
                 TextColumn::make('status.nama_status')
-                    ->label('Status'),
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($state) => match (strtolower($state)) {
+                        'diajukan' => 'info',
+                        'direkap' => 'warning',
+                        default => 'secondary',
+                    })
+                    ->icon(fn ($state) => match (strtolower($state)) {
+                        'diajukan' => 'heroicon-m-sparkles',
+                        'direkap' => 'heroicon-m-document-text',
+                        default => null,
+                    }),
                 TextColumn::make('created_at')
                     ->label('Tanggal')
                     ->date(),

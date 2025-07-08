@@ -51,27 +51,4 @@ class Pemakaian extends Model
         return $this->belongsTo(Status::class);
     }
 
-    protected static function booted(): void
-    {
-        static::created(function ($pemakaian) {
-            Persetujuan::firstOrCreate(
-                ['pemakaian_id' => $pemakaian->id],
-                [
-                    'user_id' => auth()->id() ?? 1,
-                    'status_id' => 1,
-                    'catatan' => '',
-                ]
-            );
-        });
-    }
-
-    /**
-     * persetujuan
-     *
-     * @return void
-     */
-    public function persetujuan()
-    {
-        return $this->hasOne(Persetujuan::class);
-    }
 }
