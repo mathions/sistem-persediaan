@@ -76,8 +76,10 @@ class BarangResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('No.'),
                 TextColumn::make('nama_barang')->searchable()
-                    ->label('Nama Barang'),
+                    ->label('Barang'),
                 TextColumn::make('satuan.nama_satuan'),
                 TextColumn::make('harga_beli')
                     ->label('Harga Beli')

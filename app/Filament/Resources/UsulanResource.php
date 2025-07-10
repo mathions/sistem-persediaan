@@ -18,6 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -64,7 +65,7 @@ class UsulanResource extends Resource
                                 Forms\Components\Actions\Action::make('reset')
                                     ->requiresConfirmation()
                                     ->color('danger')
-                                    ->action(fn (Forms\Set $set) => $set('detail_pemakaian', [])),
+                                    ->action(fn (Forms\Set $set) => $set('detail_usulan', [])),
                                 ])
                             ->schema([
                                 //Detail Usulan
@@ -99,6 +100,79 @@ class UsulanResource extends Resource
                                     ->addActionLabel('Tambahkan barang'),
                             ])
                     ])
+                    ->visible(fn () => auth()->user()?->role == 'pegawai'),
+
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                // User
+                                Placeholder::make('user')
+                                    ->label('Nama')
+                                    ->content(fn ($record) => $record->user?->name)
+                                    ->columnSpan([
+                                        'md' => 3,
+                                    ]),
+        
+                                // Nama Usulan
+                                Placeholder::make('nama_usulan')
+                                    ->label('Deskripsi')
+                                    ->content(fn ($record) =>$record->nama_usulan)
+                                    ->columnSpan([
+                                        'md' => 4,
+                                    ]),
+        
+                                // Status
+                                Placeholder::make('status')
+                                    ->label('Status')
+                                    ->content(fn ($record) => match (strtolower($record->status?->nama_status)) {
+                                        'diajukan' => '✨ Diajukan',
+                                        'direkap' => '📄 Direkap',
+                                        'disetujui' => '✅ Disetujui',
+                                        'ditolak' => '❌ Ditolak',
+                                        default => 'Tidak diketahui',
+                                    }),
+                            ])
+                                ->columns([
+                                    'md' => 10]),
+
+                        Forms\Components\Section::make('Daftar Barang')
+                            ->schema([
+                                //Detail Usulan
+                                Repeater::make('detail_usulan')
+                                    ->relationship()
+                                    ->schema([
+                                        TextInput::make('nama_barang')
+                                            ->label('Nama Barang')
+                                            ->placeholder('Masukkan nama barang')
+                                            ->columnSpan([
+                                                'md' => 6,
+                                            ])
+                                            ->disabled(),
+                                        TextInput::make('jumlah')
+                                            ->numeric()
+                                            ->columnSpan([
+                                                'md' => 2,
+                                            ])
+                                            ->disabled()
+                                            ->default(1),                              
+                                        Select::make('satuan_id')
+                                            ->label('Satuan')
+                                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
+                                            ->columnSpan([
+                                                'md' => 2,
+                                            ])
+                                            ->disabled(),
+                                    ])
+                                    ->columns([
+                                        'md' => 10])
+                                    ->hiddenLabel()
+                                    ->addable(false)
+                                    ->deletable(false),
+                                    ]),
+
+                    ])
+                    ->visible(fn () => auth()->user()?->role !== 'pegawai'),
             ])
             ->columns('full');
     }
@@ -107,8 +181,9 @@ class UsulanResource extends Resource
     {
         return $table
             ->columns([                
-                TextColumn::make('id')
-                    ->label('No.'),
+                TextColumn::make('no')
+                    ->label('No.')
+                    ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
                 TextColumn::make('user.name')
                     ->label('Nama'),
                 TextColumn::make('nama_usulan')
@@ -174,5 +249,11 @@ class UsulanResource extends Resource
             'create' => Pages\CreateUsulan::route('/create'),
             'edit' => Pages\EditUsulan::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->latest(); // artinya urut dari yang terbaru
     }
 }

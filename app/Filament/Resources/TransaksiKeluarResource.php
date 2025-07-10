@@ -71,16 +71,24 @@ class TransaksiKeluarResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('barang.nama_barang')->searchable(),
-                TextColumn::make('satuan.nama_satuan'),
-                TextColumn::make('jumlah'),
-                TextColumn::make('user.name'),
+                TextColumn::make('no')
+                    ->label('No.')
+                    ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
+                TextColumn::make('barang.nama_barang')
+                    ->label('Barang')
+                    ->searchable(),
+                TextColumn::make('satuan.nama_satuan')
+                    ->label('Satuan'),
+                TextColumn::make('jumlah')
+                    ->label('Jumlah'),
+                TextColumn::make('user.name')
+                    ->label('Nama'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -103,5 +111,11 @@ class TransaksiKeluarResource extends Resource
             'create' => Pages\CreateTransaksiKeluar::route('/create'),
             'edit' => Pages\EditTransaksiKeluar::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->latest(); // artinya urut dari yang terbaru
     }
 }

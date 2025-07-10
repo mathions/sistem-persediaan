@@ -6,6 +6,7 @@ use App\Filament\Resources\TransaksiMasukResource\Pages;
 use App\Filament\Resources\TransaksiMasukResource\RelationManagers;
 use App\Models\TransaksiMasuk;
 use App\Models\Barang;
+use App\Filament\Exports\TransaksiExporter;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -74,10 +75,18 @@ class TransaksiMasukResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('barang.nama_barang')->searchable(),
-                TextColumn::make('satuan.nama_satuan'),
-                TextColumn::make('jumlah'),
-                TextColumn::make('user.name'),
+                TextColumn::make('no')
+                    ->label('No.')
+                    ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
+                TextColumn::make('barang.nama_barang')
+                    ->label('Barang')
+                    ->searchable(),
+                TextColumn::make('satuan.nama_satuan')
+                    ->label('Satuan'),
+                TextColumn::make('jumlah')
+                    ->label('Jumlah'),
+                TextColumn::make('user.name')
+                    ->label('Nama'),
             ])
             ->filters([
                 //
@@ -102,11 +111,16 @@ class TransaksiMasukResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTransaksiMasuks::route('/'),
-            'create' => Pages\CreateTransaksiMasuk::route('/create'),
-            'edit' => Pages\EditTransaksiMasuk::route('/{record}/edit'),
+            // 'index' => Pages\ListTransaksiMasuks::route('/'),
+            // 'create' => Pages\CreateTransaksiMasuk::route('/create'),
+            // 'edit' => Pages\EditTransaksiMasuk::route('/{record}/edit'),
+            'index' => Pages\ManageTransaksiMasuks::route('/'),
         ];
     }
 
-
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->latest(); // artinya urut dari yang terbaru
+    }
 }

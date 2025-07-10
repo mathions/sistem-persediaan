@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\StatusPengajuan;
 use App\Filament\Resources\PemakaianResource\Pages;
 use App\Filament\Resources\PemakaianResource\RelationManagers;
 use App\Models\Pemakaian;
@@ -20,10 +19,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
-use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\View;
 
 class PemakaianResource extends Resource
 {
@@ -81,7 +78,8 @@ class PemakaianResource extends Resource
                                             ->columnSpan([
                                                 'md' => 6,
                                             ])
-                                            ->required(),
+                                            ->required()
+                                            ->reactive(),
                                         TextInput::make('jumlah')
                                             ->numeric()
                                             ->columnSpan([
@@ -91,11 +89,21 @@ class PemakaianResource extends Resource
                                             ->default(1),                              
                                         Select::make('satuan_id')
                                             ->label('Satuan')
-                                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                                            ->columnSpan([
-                                                'md' => 2,
-                                            ])
-                                            ->required(),
+                                            ->options(function (callable $get) {
+                                                $barangId = $get('barang_id');
+                                                if (!$barangId) return [];
+
+                                                $barang = \App\Models\Barang::with('satuan')->find($barangId);
+                                                if (!$barang || !$barang->satuan) return [];
+
+                                                return [
+                                                    $barang->satuan->id => $barang->satuan->nama_satuan
+                                                ];
+                                            })
+                                            ->disabled(fn (callable $get) => !$get('barang_id')) // opsional: disable sampai barang dipilih
+                                            ->required()
+                                            ->reactive()
+                                            ->columnSpan(['md' => 2]),
                                     ])
                                     ->columns([
                                         'md' => 10])
@@ -185,8 +193,9 @@ class PemakaianResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('No.'),
+                TextColumn::make('no')
+                    ->label('No.')
+                    ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
                 TextColumn::make('user.name')
                     ->label('Nama'),
                 TextColumn::make('nama_pemakaian')
@@ -254,8 +263,13 @@ class PemakaianResource extends Resource
         return [
             'index' => Pages\ListPemakaians::route('/'),
             'create' => Pages\CreatePemakaian::route('/create'),
-            'view' => Pages\ViewPemakaian::route('/{record}'),
             'edit' => Pages\EditPemakaian::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->latest(); // artinya urut dari yang terbaru
     }
 }

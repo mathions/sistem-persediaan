@@ -41,9 +41,12 @@ class DetailUsulanResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('no')
+                    ->label('No.')
+                    ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
                 TextColumn::make('nama_barang')
                     ->searchable()
-                    ->label('Nama Barang'),
+                    ->label('Barang'),
                 TextColumn::make('satuan.nama_satuan')
                     ->label('Satuan'),
                 TextColumn::make('jumlah')
@@ -79,5 +82,11 @@ class DetailUsulanResource extends Resource
             'create' => Pages\CreateDetailUsulan::route('/create'),
             'edit' => Pages\EditDetailUsulan::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->latest(); // artinya urut dari yang terbaru
     }
 }

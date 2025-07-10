@@ -51,9 +51,12 @@ class SatuanResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('No.')
+                    ->width('80px'),
                 TextColumn::make('nama_satuan')
                     ->searchable()
-                    ->label('Nama Satuan'),
+                    ->label('Satuan'),
             ])
             ->filters([
                 //
