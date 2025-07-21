@@ -42,15 +42,6 @@ class Barang extends Model
         return $this->hasMany(TransaksiKeluar::class);
     }
 
-    /**
-     * detail_pemakaian
-     *
-     * @return void
-     */
-    public function detail_pemakaian()
-    {
-        return $this->hasMany(Transaksi::class);
-    }
 
     /**
      * satuan

@@ -38,23 +38,24 @@ class TransaksiKeluarResource extends Resource
                 Card::make()
                     ->schema([
 
-                        // Barang
-                        Select::make('barang_id')
-                            ->label('Barang')
-                            ->relationship('barang', 'nama_barang') // pastikan relasi ada di model
+                        // Referensi
+                        Select::make('referensi_id')
+                            ->label('Referensi')
+                            ->options(function () {
+                                return \App\Models\Referensi::all()
+                                    ->mapWithKeys(function ($ref) {
+                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                        return [$ref->id => $label];
+                                    });
+                            })
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->columnSpan(2),
 
-                        // Satuan
-                        Select::make('satuan_id')
-                            ->label('Satuan')
-                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                            ->required(),
-
-                        // Jumlah
-                        TextInput::make('jumlah')
-                            ->label('Jumlah')
-                            ->placeholder('Masukkan jumlah')
+                        // Volume
+                        TextInput::make('volume')
+                            ->label('Volume')
+                            ->placeholder('Masukkan volume')
                             ->numeric()
                             ->minValue(1)
                             ->required(),
@@ -74,15 +75,18 @@ class TransaksiKeluarResource extends Resource
                 TextColumn::make('no')
                     ->label('No.')
                     ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
-                TextColumn::make('barang.nama_barang')
+                TextColumn::make('referensi.nama_barang')
                     ->label('Barang')
                     ->searchable(),
-                TextColumn::make('satuan.nama_satuan')
+                TextColumn::make('referensi.satuan.nama_satuan')
                     ->label('Satuan'),
-                TextColumn::make('jumlah')
-                    ->label('Jumlah'),
+                TextColumn::make('volume')
+                    ->label('Volume'),
                 TextColumn::make('user.name')
                     ->label('Nama'),
+                TextColumn::make('created_at')
+                    ->label('Tanggal')
+                    ->date(),
             ])
             ->filters([
                 //
@@ -107,9 +111,7 @@ class TransaksiKeluarResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTransaksiKeluars::route('/'),
-            'create' => Pages\CreateTransaksiKeluar::route('/create'),
-            'edit' => Pages\EditTransaksiKeluar::route('/{record}/edit'),
+            'index' => Pages\ManageTransaksiKeluars::route('/'),
         ];
     }
 

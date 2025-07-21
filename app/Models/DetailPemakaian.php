@@ -17,9 +17,8 @@ class DetailPemakaian extends Model
 
     protected $fillable = [
         'pemakaian_id',
-        'barang_id',
-        'satuan_id',
-        'jumlah',
+        'referensi_id',
+        'volume',
     ];
 
     /**
@@ -33,22 +32,13 @@ class DetailPemakaian extends Model
     }
 
     /**
-     * barangs
+     * referensi
      *
      * @return void
      */
-    public function barang()
+    public function referensi()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Referensi::class);
     }
 
-    /**
-     * satuan
-     *
-     * @return void
-     */
-    public function satuan()
-    {
-        return $this->belongsTo(Satuan::class);
-    }
 }

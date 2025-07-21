@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('transaksi_keluars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_id');
-            $table->foreignId('satuan_id');
-            $table->integer('jumlah');
+            $table->foreignId('referensi_id')->constrained('referensis');
+            $table->integer('volume');
             $table->foreignId('user_id');
             $table->timestamps();
         });

@@ -42,32 +42,48 @@ class TransaksiMasukResource extends Resource
                 Card::make()
                     ->schema([
 
-                        // Barang
-                        Select::make('barang_id')
-                            ->label('Barang')
-                            ->relationship('barang', 'nama_barang') // pastikan relasi ada di model
+                        // Referensi
+                        Select::make('referensi_id')
+                            ->label('Referensi')
+                            ->options(function () {
+                                return \App\Models\Referensi::all()
+                                    ->mapWithKeys(function ($ref) {
+                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                        return [$ref->id => $label];
+                                    });
+                            })
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->columnSpan(2),
 
-                        // Satuan
-                        Select::make('satuan_id')
-                            ->label('Satuan')
-                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                            ->required(),
-
-                        // Jumlah
-                        TextInput::make('jumlah')
-                            ->label('Jumlah')
-                            ->placeholder('Masukkan jumlah')
+                        // Harga Beli
+                        TextInput::make('harga_beli')
+                            ->label('Harga Beli')
+                            ->placeholder('Masukkan harga beli')
                             ->numeric()
-                            ->minValue(1)
+                            ->required()
+                            ->prefix('Rp'),
+
+                        // Volume
+                        TextInput::make('volume')
+                            ->label('Volume')
+                            ->placeholder('Masukkan volume')
+                            ->numeric()
                             ->required(),
+
+                        // Keterangan
+                        TextInput::make('keterangan')
+                            ->label('Keterangan')
+                            ->placeholder('Masukkan keterangan')
+                            ->nullable()
+                            ->columnSpan(2),
 
                         // user_id disembunyikan, terisi otomatis dari user login
                         Hidden::make('user_id')
                             ->default(fn () => auth()->id()),
 
                     ])
+                    ->columns(2),
             ]);
     }
 
@@ -78,21 +94,27 @@ class TransaksiMasukResource extends Resource
                 TextColumn::make('no')
                     ->label('No.')
                     ->getStateUsing(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($item) => $item->id === $record->id) + 1),
-                TextColumn::make('barang.nama_barang')
+                TextColumn::make('referensi.nama_barang')
                     ->label('Barang')
                     ->searchable(),
-                TextColumn::make('satuan.nama_satuan')
+                TextColumn::make('referensi.satuan.nama_satuan')
                     ->label('Satuan'),
-                TextColumn::make('jumlah')
-                    ->label('Jumlah'),
-                TextColumn::make('user.name')
-                    ->label('Nama'),
+                TextColumn::make('harga_beli')
+                    ->label('Harga Beli')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.')),
+                TextColumn::make('volume')
+                    ->label('Volume'),
+                TextColumn::make('total')
+                    ->label('Total')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.')),
+                TextColumn::make('keterangan')
+                    ->label('Keterangan'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -111,9 +133,6 @@ class TransaksiMasukResource extends Resource
     public static function getPages(): array
     {
         return [
-            // 'index' => Pages\ListTransaksiMasuks::route('/'),
-            // 'create' => Pages\CreateTransaksiMasuk::route('/create'),
-            // 'edit' => Pages\EditTransaksiMasuk::route('/{record}/edit'),
             'index' => Pages\ManageTransaksiMasuks::route('/'),
         ];
     }

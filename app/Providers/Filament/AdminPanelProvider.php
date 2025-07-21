@@ -30,6 +30,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
             ])
+            ->brandName('SPBP')
+            ->brandLogo(asset('images/SPBP.svg'))
+            ->brandLogoHeight('2rem')
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -39,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Pengajuan',
                 'Rekapitulasi',
-                'Kelola Barang',
+                'Kelola Persediaan',
                 'Transaksi',
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')

@@ -17,30 +17,22 @@ class TransaksiMasuk extends Model
      * @var array
      */
     protected $fillable = [
-        'barang_id',
-        'satuan_id',
-        'jumlah',
-        'user_id'
+        'referensi_id',
+        'harga_beli',
+        'volume',
+        'total',
+        'keterangan',
+        'user_id',
     ];
 
     /**
-     * barang
+     * referensi
      *
      * @return void
      */
-    public function barang()
+    public function referensi()
     {
-        return $this->belongsTo(Barang::class);
-    }
-
-    /**
-     * satuan
-     *
-     * @return void
-     */
-    public function satuan()
-    {
-        return $this->belongsTo(Satuan::class);
+        return $this->belongsTo(Referensi::class);
     }
 
     /**
@@ -53,32 +45,37 @@ class TransaksiMasuk extends Model
         return $this->belongsTo(User::class);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($stock) {
+            $stock->total = ((float) $stock->harga_beli) * ((float) $stock->volume);
+        });
+    }
+
     protected static function booted()
     {
-        static::creating(function ($transaksi) {
-            // Cek apakah ada barang dengan nama dan satuan yang sama
-            $existing = Barang::where('nama_barang', $transaksi->barang->nama_barang)
-                ->where('satuan_id', $transaksi->satuan_id)
-                ->first();
+        static::created(function ($transaksi) {
+            $existing = \App\Models\Stok::where('referensi_id', $transaksi->referensi_id)->first();
 
             if ($existing) {
-                // Tambahkan stok ke barang yang sudah ada
-                $existing->increment('stok', $transaksi->jumlah);
-
-                // Set barang_id transaksi ke ID barang yang sudah ada
-                $transaksi->barang_id = $existing->id;
-            } else {
-                // Buat barang baru dengan stok awal dari transaksi
-                $barangBaru = Barang::create([
-                    'nama_barang' => $transaksi->barang->nama_barang,
-                    'satuan_id'   => $transaksi->satuan_id,
-                    'stok'        => $transaksi->jumlah,
-                    'harga_beli'  => $transaksi->barang->harga_beli ?? 0, // default 0 kalau null
+                // Update volume, harga_beli, dan total
+                $existing->update([
+                    'volume' => $existing->volume + $transaksi->volume,
+                    'harga_beli' => $transaksi->harga_beli,
+                    'total' => ($existing->volume + $transaksi->volume) * $transaksi->harga_beli,
                 ]);
-
-                // Set barang_id transaksi ke barang baru
-                $transaksi->barang_id = $barangBaru->id;
+            } else {
+                // Buat stok baru
+                \App\Models\Stok::create([
+                    'referensi_id' => $transaksi->referensi_id,
+                    'harga_beli'   => $transaksi->harga_beli,
+                    'volume'       => $transaksi->volume,
+                    'total'        => $transaksi->harga_beli * $transaksi->volume,
+                ]);
             }
         });
     }
+
 }

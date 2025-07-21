@@ -30,6 +30,16 @@ class Satuan extends Model
     }
 
     /**
+     * referensi
+     *
+     * @return void
+     */
+    public function referensi()
+    {
+        return $this->hasMany(Referensi::class);
+    }
+
+    /**
      * transaksi masuk
      *
      * @return void

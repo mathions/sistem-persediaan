@@ -15,30 +15,19 @@ class TransaksiKeluar extends Model
      * @var array
      */
     protected $fillable = [
-        'barang_id',
-        'satuan_id',
-        'jumlah',
+        'referensi_id',
+        'volume',
         'user_id'
     ];
 
     /**
-     * barang
+     * referensi
      *
      * @return void
      */
-    public function barang()
+    public function referensi()
     {
-        return $this->belongsTo(Barang::class);
-    }
-
-    /**
-     * satuan
-     *
-     * @return void
-     */
-    public function satuan()
-    {
-        return $this->belongsTo(Satuan::class);
+        return $this->belongsTo(Referensi::class);
     }
 
     /**

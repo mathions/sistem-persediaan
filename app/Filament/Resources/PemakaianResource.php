@@ -44,7 +44,7 @@ class PemakaianResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 // user_id disembunyikan, terisi otomatis dari user login
-                                TextInput::make('user_id')
+                                Hidden::make('user_id')
                                     ->default(fn () => auth()->id()),
         
                                 // Nama Pemakaian
@@ -59,7 +59,7 @@ class PemakaianResource extends Resource
                                     ->default(1),
                             ]),
 
-                        Forms\Components\Section::make('Daftar Barang')
+                        Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->headerActions([
                                 Forms\Components\Actions\Action::make('reset')
                                     ->requiresConfirmation()
@@ -71,42 +71,30 @@ class PemakaianResource extends Resource
                                 Repeater::make('detail_pemakaian')
                                     ->relationship()
                                     ->schema([
-                                        Select::make('barang_id')
-                                            ->label('Nama Barang')
-                                            ->relationship('barang', 'nama_barang') // pastikan relasi ada di model
+                                        Select::make('referensi_id')
+                                            ->label('Referensi')
+                                            ->options(function () {
+                                                return \App\Models\Referensi::all()
+                                                    ->mapWithKeys(function ($ref) {
+                                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                                        return [$ref->id => $label];
+                                                    });
+                                            })
                                             ->searchable()
-                                            ->columnSpan([
-                                                'md' => 6,
-                                            ])
                                             ->required()
-                                            ->reactive(),
-                                        TextInput::make('jumlah')
+                                            ->columnSpan([
+                                                    'md' => 2,
+                                                ]),
+                                        TextInput::make('volume')
                                             ->numeric()
                                             ->columnSpan([
-                                                'md' => 2,
+                                                'md' => 1,
                                             ])
                                             ->required()
-                                            ->default(1),                              
-                                        Select::make('satuan_id')
-                                            ->label('Satuan')
-                                            ->options(function (callable $get) {
-                                                $barangId = $get('barang_id');
-                                                if (!$barangId) return [];
-
-                                                $barang = \App\Models\Barang::with('satuan')->find($barangId);
-                                                if (!$barang || !$barang->satuan) return [];
-
-                                                return [
-                                                    $barang->satuan->id => $barang->satuan->nama_satuan
-                                                ];
-                                            })
-                                            ->disabled(fn (callable $get) => !$get('barang_id')) // opsional: disable sampai barang dipilih
-                                            ->required()
-                                            ->reactive()
-                                            ->columnSpan(['md' => 2]),
+                                            ->default(1),
                                     ])
                                     ->columns([
-                                        'md' => 10])
+                                        'md' => 3])
                                     ->hiddenLabel()
                                     ->addActionLabel('Tambahkan barang'),
                                     ]),
@@ -147,37 +135,36 @@ class PemakaianResource extends Resource
                                 ->columns([
                                     'md' => 10]),
 
-                        Forms\Components\Section::make('Daftar Barang')
+                        Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->schema([
                                 //Detail Pemakaian
                                 Repeater::make('detail_pemakaian')
                                     ->relationship()
                                     ->schema([
-                                        Select::make('barang_id')
-                                            ->label('Nama Barang')
-                                            ->relationship('barang', 'nama_barang') // pastikan relasi ada di model
+                                        Select::make('referensi_id')
+                                            ->label('Referensi')
+                                            ->options(function () {
+                                                return \App\Models\Referensi::all()
+                                                    ->mapWithKeys(function ($ref) {
+                                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                                        return [$ref->id => $label];
+                                                    });
+                                            })
                                             ->disabled()
+                                            ->required()
                                             ->columnSpan([
-                                                'md' => 6,
-                                            ])
-                                            ->required(),
-                                        TextInput::make('jumlah')
+                                                    'md' => 2,
+                                                ]),
+                                        TextInput::make('volume')
                                             ->numeric()
                                             ->columnSpan([
-                                                'md' => 2,
+                                                'md' => 1,
                                             ])
                                             ->disabled()
                                             ->default(1),                              
-                                        Select::make('satuan_id')
-                                            ->label('Satuan')
-                                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                                            ->columnSpan([
-                                                'md' => 2,
-                                            ])
-                                            ->disabled(),
                                     ])
                                     ->columns([
-                                        'md' => 10])
+                                        'md' => 3])
                                     ->hiddenLabel()
                                     ->addable(false)
                                     ->deletable(false),

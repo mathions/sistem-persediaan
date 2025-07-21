@@ -30,46 +30,65 @@ class EditPemakaian extends EditRecord
                     $this->record->status_id != 3
                 )
                 ->action(function () {
-                    // Validasi stok terlebih dahulu (tanpa DB::transaction)
                     foreach ($this->record->detail_pemakaian as $detail) {
-                        $barang = $detail->barang;
+                        $referensi = $detail->referensi;
 
-                        if ($barang->stok < $detail->jumlah) {
+                        // Hitung total stok tersedia dari semua entri stok untuk referensi ini
+                        $stokTersedia = \App\Models\Stok::where('referensi_id', $referensi->id)->sum('volume');
+
+                        if ($stokTersedia < $detail->volume) {
                             Notification::make()
                                 ->title('Stok Tidak Cukup')
-                                ->body("Stok untuk barang <strong>{$barang->nama_barang}</strong> hanya tersedia <strong>{$barang->stok}</strong>, tapi yang diminta <strong>{$detail->jumlah}</strong>.")
+                                ->body("Stok untuk barang <strong>{$referensi->nama_barang}</strong> hanya tersedia <strong>{$stokTersedia}</strong>, tapi yang diminta <strong>{$detail->volume}</strong>.")
                                 ->danger()
                                 ->persistent()
                                 ->send();
 
-                            return; // hentikan action tanpa lanjut
+                            return;
                         }
                     }
 
-                    // Semua stok cukup, lakukan transaksi
+                    // Lanjut jika semua stok cukup
                     \DB::transaction(function () {
                         $this->record->update(['status_id' => 3]);
 
                         foreach ($this->record->detail_pemakaian as $detail) {
+                            $referensiId = $detail->referensi_id;
+                            $jumlah = $detail->volume;
+                            $userId = $this->record->user_id;
+
+                            // Catat transaksi keluar (jika modelnya ada)
                             \App\Models\TransaksiKeluar::create([
-                                'barang_id' => $detail->barang_id,
-                                'satuan_id' => $detail->satuan_id,
-                                'jumlah' => $detail->jumlah,
-                                'user_id' => $this->record->user_id,
+                                'referensi_id' => $referensiId,
+                                'volume' => $jumlah,
+                                'user_id' => $userId,
                             ]);
 
-                            $detail->barang->decrement('stok', $detail->jumlah);
+                            // Kurangi stok berdasarkan FIFO dari tabel stok
+                            $stokList = \App\Models\Stok::where('referensi_id', $referensiId)
+                                ->where('volume', '>', 0)
+                                ->orderBy('created_at')
+                                ->get();
+
+                            foreach ($stokList as $stok) {
+                                if ($jumlah <= 0) break;
+
+                                $pakai = min($stok->volume, $jumlah);
+                                $stok->decrement('volume', $pakai);
+                                $jumlah -= $pakai;
+                            }
                         }
                     });
 
-                    Notification::make()
-                        ->title('Disetujui')
-                        ->body('Pengajuan disetujui dan stok barang berhasil dikurangi.')
-                        ->success()
-                        ->send();
+                Notification::make()
+                    ->title('Disetujui')
+                    ->body('Pengajuan disetujui dan stok berhasil dikurangi.')
+                    ->success()
+                    ->send();
 
-                    return redirect(\App\Filament\Resources\PemakaianResource::getUrl('index'));
-                }),
+                return redirect(\App\Filament\Resources\PemakaianResource::getUrl('index'));
+            }),
+
 
             // Tolak hanya untuk user yang bukan pegawai
             Actions\Action::make('Tolak')
@@ -90,6 +109,13 @@ class EditPemakaian extends EditRecord
 
                     return redirect(PemakaianResource::getUrl('index'));
                 }),
+
+        // Tombol download PDF
+        Actions\Action::make('Download PDF')
+            ->label('Download PDF')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->url(fn () => route('pemakaian.pdf', ['pemakaian' => $this->record->id]))
+            ->openUrlInNewTab(),
         ];
     }
 

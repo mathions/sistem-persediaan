@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('detail_pemakaians', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pemakaian_id');
-            $table->foreignId('barang_id');
-            $table->string('satuan_id');
-            $table->integer('jumlah');
+            $table->foreignId('referensi_id');
+            $table->integer('volume');
             $table->timestamps();
         });
     }
