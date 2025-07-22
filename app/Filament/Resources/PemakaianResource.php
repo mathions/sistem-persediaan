@@ -230,6 +230,7 @@ class PemakaianResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -250,6 +251,7 @@ class PemakaianResource extends Resource
         return [
             'index' => Pages\ListPemakaians::route('/'),
             'create' => Pages\CreatePemakaian::route('/create'),
+            'view' => Pages\ViewPemakaian::route('/{record}'),
             'edit' => Pages\EditPemakaian::route('/{record}/edit'),
         ];
     }

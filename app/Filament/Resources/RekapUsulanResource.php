@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DetailUsulanResource\Pages;
-use App\Filament\Resources\DetailUsulanResource\RelationManagers;
-use App\Models\DetailUsulan;
-use App\Filament\Exports\DetailUsulanExporter;
+use App\Filament\Resources\RekapUsulanResource\Pages;
+use App\Filament\Resources\RekapUsulanResource\RelationManagers;
+use App\Models\RekapUsulan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,18 +15,18 @@ use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DetailUsulanResource extends Resource
+class RekapUsulanResource extends Resource
 {
-    protected static ?string $model = DetailUsulan::class;
+    protected static ?string $model = RekapUsulan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Lainnya';
+        return 'Rekapitulasi';
     }
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -60,6 +59,7 @@ class DetailUsulanResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -68,25 +68,10 @@ class DetailUsulanResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDetailUsulans::route('/'),
-            'create' => Pages\CreateDetailUsulan::route('/create'),
-            'edit' => Pages\EditDetailUsulan::route('/{record}/edit'),
+            'index' => Pages\ManageRekapUsulans::route('/'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->latest(); // artinya urut dari yang terbaru
     }
 }

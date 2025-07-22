@@ -59,23 +59,5 @@ class Satuan extends Model
         return $this->hasMany(TransaksiKeluar::class);
     }
 
-    /**
-     * detail usulan
-     *
-     * @return void
-     */
-    public function detail_usulan()
-    {
-        return $this->hasMany(DetailUsulan::class);
-    }
 
-    /**
-     * detail usulan
-     *
-     * @return void
-     */
-    public function detail_pemakaian()
-    {
-        return $this->hasMany(DetailPemakaian::class);
-    }
 }

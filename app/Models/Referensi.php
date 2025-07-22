@@ -40,14 +40,33 @@ class Referensi extends Model
         return $this->hasMany(Stok::class);
     }
 
-    
     /**
-     * detail_pemakaian
+     * detail usulan
+     *
+     * @return void
+     */
+    public function detail_usulan()
+    {
+        return $this->hasMany(DetailUsulan::class);
+    }
+
+    /**
+     * detail pemakaian
      *
      * @return void
      */
     public function detail_pemakaian()
     {
-        return $this->hasMany(Transaksi::class);
+        return $this->hasMany(DetailPemakaian::class);
+    }
+
+    /**
+     * rekap usulan
+     *
+     * @return void
+     */
+    public function rekap_usulan()
+    {
+        return $this->hasMany(RekapUsulan::class);
     }
 }

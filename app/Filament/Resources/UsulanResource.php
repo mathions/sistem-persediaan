@@ -60,7 +60,7 @@ class UsulanResource extends Resource
                                 ->default(1),
                         ]),
 
-                        Forms\Components\Section::make('Daftar Barang')
+                        Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->headerActions([
                                 Forms\Components\Actions\Action::make('reset')
                                     ->requiresConfirmation()
@@ -72,33 +72,33 @@ class UsulanResource extends Resource
                                 Repeater::make('detail_usulan')
                                     ->relationship()
                                     ->schema([
-                                        TextInput::make('nama_barang')
-                                            ->label('Nama Barang')
-                                            ->placeholder('Masukkan nama barang')
+                                        Select::make('referensi_id')
+                                            ->label('Referensi')
+                                            ->options(function () {
+                                                return \App\Models\Referensi::all()
+                                                    ->mapWithKeys(function ($ref) {
+                                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                                        return [$ref->id => $label];
+                                                    });
+                                            })
+                                            ->searchable()
+                                            ->required()
                                             ->columnSpan([
-                                                'md' => 6,
-                                            ])
-                                            ->required(),
-                                        TextInput::make('jumlah')
+                                                    'md' => 2,
+                                                ]),
+                                        TextInput::make('volume')
                                             ->numeric()
                                             ->columnSpan([
-                                                'md' => 2,
+                                                'md' => 1,
                                             ])
                                             ->required()
-                                            ->default(1),                              
-                                        Select::make('satuan_id')
-                                            ->label('Satuan')
-                                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                                            ->columnSpan([
-                                                'md' => 2,
-                                            ])
-                                            ->required(),
+                                            ->default(1),
                                     ])
                                     ->columns([
-                                        'md' => 10])
+                                        'md' => 3])
                                     ->hiddenLabel()
                                     ->addActionLabel('Tambahkan barang'),
-                            ])
+                                    ]),
                     ])
                     ->visible(fn () => auth()->user()?->role == 'pegawai'),
 
@@ -142,30 +142,30 @@ class UsulanResource extends Resource
                                 Repeater::make('detail_usulan')
                                     ->relationship()
                                     ->schema([
-                                        TextInput::make('nama_barang')
-                                            ->label('Nama Barang')
-                                            ->placeholder('Masukkan nama barang')
+                                        Select::make('referensi_id')
+                                            ->label('Referensi')
+                                            ->options(function () {
+                                                return \App\Models\Referensi::all()
+                                                    ->mapWithKeys(function ($ref) {
+                                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
+                                                        return [$ref->id => $label];
+                                                    });
+                                            })
+                                            ->disabled()
+                                            ->required()
                                             ->columnSpan([
-                                                'md' => 6,
-                                            ])
-                                            ->disabled(),
-                                        TextInput::make('jumlah')
+                                                    'md' => 2,
+                                                ]),
+                                        TextInput::make('volume')
                                             ->numeric()
                                             ->columnSpan([
-                                                'md' => 2,
+                                                'md' => 1,
                                             ])
                                             ->disabled()
                                             ->default(1),                              
-                                        Select::make('satuan_id')
-                                            ->label('Satuan')
-                                            ->relationship('satuan', 'nama_satuan') // pastikan relasi ada di model
-                                            ->columnSpan([
-                                                'md' => 2,
-                                            ])
-                                            ->disabled(),
                                     ])
                                     ->columns([
-                                        'md' => 10])
+                                        'md' => 3])
                                     ->hiddenLabel()
                                     ->addable(false)
                                     ->deletable(false),

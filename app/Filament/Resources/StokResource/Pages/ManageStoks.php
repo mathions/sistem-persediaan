@@ -14,6 +14,12 @@ class ManageStoks extends ManageRecords
     {
         return [
             Actions\CreateAction::make(),
+
+            Actions\Action::make('Unduh Laporan')
+                ->label('Unduh Laporan')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(fn () => route('stok.pdf'))
+                ->openUrlInNewTab(),
         ];
     }
 }

@@ -27,7 +27,7 @@ class BarangResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Kelola Persediaan';
+        return 'Lainnya';
     }
 
     protected static ?int $navigationSort = 4;

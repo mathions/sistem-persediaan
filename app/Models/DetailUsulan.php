@@ -17,9 +17,8 @@ class DetailUsulan extends Model
 
     protected $fillable = [
         'usulan_id',
-        'nama_barang',
-        'satuan_id',
-        'jumlah',
+        'referensi_id',
+        'volume',
     ];
 
     /**
@@ -33,12 +32,32 @@ class DetailUsulan extends Model
     }
 
     /**
-     * satuan
+     * referensi
      *
      * @return void
      */
-    public function satuan()
+    public function referensi()
     {
-        return $this->belongsTo(Satuan::class);
+        return $this->belongsTo(Referensi::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($detailUsulan) {
+            $rekap = \App\Models\RekapUsulan::where('referensi_id', $detailUsulan->referensi_id)->first();
+
+            if ($rekap) {
+                // Jika sudah ada, tambahkan volume
+                $rekap->update([
+                    'volume' => $rekap->volume + $detailUsulan->volume,
+                ]);
+            } else {
+                // Jika belum ada, buat baru
+                \App\Models\RekapUsulan::create([
+                    'referensi_id' => $detailUsulan->referensi_id,
+                    'volume' => $detailUsulan->volume,
+                ]);
+            }
+        });
     }
 }

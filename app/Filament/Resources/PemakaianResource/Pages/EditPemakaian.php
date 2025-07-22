@@ -109,13 +109,6 @@ class EditPemakaian extends EditRecord
 
                     return redirect(PemakaianResource::getUrl('index'));
                 }),
-
-        // Tombol download PDF
-        Actions\Action::make('Download PDF')
-            ->label('Download PDF')
-            ->icon('heroicon-o-arrow-down-tray')
-            ->url(fn () => route('pemakaian.pdf', ['pemakaian' => $this->record->id]))
-            ->openUrlInNewTab(),
         ];
     }
 
