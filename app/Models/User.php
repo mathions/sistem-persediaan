@@ -22,6 +22,7 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'name',
         'email',
+        'nip',
         'password',
         'role',
     ];
@@ -72,5 +73,25 @@ class User extends Authenticatable implements FilamentUser
     public function transaksi_keluar()
     {
         return $this->hasMany(TransaksiKeluar::class);
+    }
+
+    /**
+     * usulan
+     *
+     * @return void
+     */
+    public function usulan()
+    {
+        return $this->hasMany(Usulan::class);
+    }
+
+    /**
+     * pemakaian
+     *
+     * @return void
+     */
+    public function pemakaian()
+    {
+        return $this->hasMany(Pemakaian::class);
     }
 }

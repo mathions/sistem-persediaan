@@ -16,9 +16,18 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'User',
-            'email' => 'user@gmail.com',
+            'name' => 'Admin',
+            'email' => 'admin@bps.go.id',
+            'nip' => '200110282024121003',
             'role' => 'admin',
+            'password' => 'admin',
+        ]);
+
+        User::factory()->create([
+            'name' => 'User',
+            'email' => 'user@bps.go.id',
+            'nip' => '200110282024121003',
+            'role' => 'pegawai',
             'password' => 'user',
         ]);
 
@@ -26,6 +35,8 @@ class DatabaseSeeder extends Seeder
             SatuanSeeder::class,
             UserSeeder::class,
             StatusSeeder::class,
+            ReferensiSeeder::class,
+            StokSeeder::class,
         ]);
 
     }

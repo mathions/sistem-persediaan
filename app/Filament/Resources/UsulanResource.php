@@ -58,7 +58,7 @@ class UsulanResource extends Resource
                             // Status
                             Hidden::make('status_id')
                                 ->default(1),
-                        ])->visible(fn ($record) => auth()->id() === $record->user_id),
+                        ])->visible(fn () => auth()->user()?->role === 'pegawai'),
 
                         Forms\Components\Section::make()
                             ->schema([
@@ -91,7 +91,7 @@ class UsulanResource extends Resource
                             ])
                             ->columns([
                                 'md' => 10])
-                            ->visible(fn ($record) => auth()->id() !== $record->user_id),
+                            ->visible(fn () => auth()->user()?->role !== 'pegawai'),
 
                         Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->headerActions([

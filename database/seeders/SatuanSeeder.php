@@ -16,11 +16,13 @@ class SatuanSeeder extends Seeder
         $satuans = [
             'Lusin',
             'Buah',
+            'Rim',
             'Gros',
             'Bks',
             'Pcs',
             'Botol',
             'Kotak',
+            'Dokumen',
             'Kotak Besar',
         ];
 

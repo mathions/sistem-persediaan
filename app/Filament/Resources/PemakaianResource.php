@@ -58,7 +58,7 @@ class PemakaianResource extends Resource
                                 Hidden::make('status_id')
                                     ->default(1),
                             ])
-                            ->visible(fn ($record) => auth()->id() === $record->user_id),
+                            ->visible(fn () => auth()->user()?->role === 'pegawai'),
 
                         Forms\Components\Section::make()
                             ->schema([
@@ -90,15 +90,14 @@ class PemakaianResource extends Resource
                                         }),
                                 ])
                             ->columns(['md' => 10])
-                            ->visible(fn ($record) => auth()->id() !== $record->user_id),
+                            ->visible(fn () => auth()->user()?->role !== 'pegawai'),
 
                         Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->headerActions([
                                 Forms\Components\Actions\Action::make('reset')
                                     ->requiresConfirmation()
                                     ->color('danger')
-                                    ->action(fn (Forms\Set $set) => $set('detail_pemakaian', []))
-                                    ->visible(fn ($record) => auth()->id() === $record->user_id),
+                                    ->action(fn (Forms\Set $set) => $set('detail_pemakaian', [])),
                                     ])
                             ->schema([
                                 //Detail Pemakaian
@@ -192,8 +191,7 @@ class PemakaianResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => auth()->id() === $record->user_id),
-                Tables\Actions\ViewAction::make()
-                    ->visible(fn ($record) => auth()->id() !== $record->user_id),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

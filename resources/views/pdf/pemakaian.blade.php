@@ -64,13 +64,13 @@
                 <td style="width: 50%; border: none;">
                     Mengetahui,<br>Kasubbag Umum <br> BPS Kabupaten Nias Utara<br><br><br><br><br><br>
                     <strong>Karya Jaya Zendrato, S.ST., M.SE</strong><br>
-                    NIP. 1992199219919119
+                    NIP. 199206082014121001
                 </td>
                 <td style="width: 50%; border: none;">
                     <br>Lotu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
                     Penerima Barang<br><br><br><br><br><br>
                     <strong>{{ $pemakaian->user->name }}</strong><br>
-                    NIP. 2001123012301230
+                    NIP. {{ $pemakaian->user->nip }}
                 </td>
             </tr>
         </table>

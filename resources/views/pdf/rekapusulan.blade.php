@@ -92,8 +92,8 @@
                 <td></td>
             </tr>
             <tr>
-                <td>Darma Beriman Telaumbanua, SE, MM</td>
-                <td>Supriadi Hia, SST, M.Stat.</td>
+                <td><strong>Darma Beriman Telaumbanua, SE, MM</strong><br>NIP. 197810182001121003</td>
+                <td><strong>Supriadi Hia, SST, M.Stat.</strong><br>NIP. 199310292016021001</td>
             </tr>
         </table>
     </div>

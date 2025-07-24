@@ -100,7 +100,7 @@ class ViewPemakaian extends ViewRecord
                 ->requiresConfirmation()
                 ->visible(fn () =>
                     auth()->user()?->role !== 'pegawai' &&
-                    $this->record->status_id != 4
+                    $this->record->status_id == 1
                 )
                 ->action(function () {
                     $this->record->update(['status_id' => 4]); // 4 = Ditolak
