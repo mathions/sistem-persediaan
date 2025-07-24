@@ -13,13 +13,14 @@ class ManageStoks extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
 
             Actions\Action::make('Unduh Laporan')
                 ->label('Unduh Laporan')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->url(fn () => route('stok.pdf'))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => auth()->user()?->role !== 'pegawai'),
         ];
     }
 }

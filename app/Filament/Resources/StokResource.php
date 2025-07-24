@@ -97,8 +97,10 @@ class StokResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn () => auth()->user()?->role === 'admin'),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => auth()->user()?->role === 'admin'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

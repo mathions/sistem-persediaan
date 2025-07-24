@@ -57,14 +57,48 @@ class PemakaianResource extends Resource
                                 // Status
                                 Hidden::make('status_id')
                                     ->default(1),
-                            ]),
+                            ])
+                            ->visible(fn ($record) => auth()->id() === $record->user_id),
+
+                        Forms\Components\Section::make()
+                            ->schema([
+                                // User
+                                Placeholder::make('user')
+                                    ->label('Nama')
+                                    ->content(fn ($record) => $record->user?->name)
+                                    ->columnSpan([
+                                        'md' => 3,
+                                    ]),
+        
+                                // Nama Pemakaian
+                                Placeholder::make('nama_pemakaian')
+                                    ->label('Deskripsi')
+                                    ->content(fn ($record) =>$record->nama_pemakaian)
+                                    ->columnSpan([
+                                        'md' => 4,
+                                    ]),
+            
+                                    // Status
+                                    Placeholder::make('status')
+                                        ->label('Status')
+                                        ->content(fn ($record) => match (strtolower($record->status?->nama_status)) {
+                                            'diajukan' => '✨ Diajukan',
+                                            'direkap' => '📄 Direkap',
+                                            'disetujui' => '✅ Disetujui',
+                                            'ditolak' => '❌ Ditolak',
+                                            default => 'Tidak diketahui',
+                                        }),
+                                ])
+                            ->columns(['md' => 10])
+                            ->visible(fn ($record) => auth()->id() !== $record->user_id),
 
                         Forms\Components\Section::make('Daftar Barang Persediaan')
                             ->headerActions([
                                 Forms\Components\Actions\Action::make('reset')
                                     ->requiresConfirmation()
                                     ->color('danger')
-                                    ->action(fn (Forms\Set $set) => $set('detail_pemakaian', [])),
+                                    ->action(fn (Forms\Set $set) => $set('detail_pemakaian', []))
+                                    ->visible(fn ($record) => auth()->id() === $record->user_id),
                                     ])
                             ->schema([
                                 //Detail Pemakaian
@@ -99,79 +133,6 @@ class PemakaianResource extends Resource
                                     ->addActionLabel('Tambahkan barang'),
                                     ]),
                     ])
-                    ->visible(fn () => auth()->user()?->role == 'pegawai'),
-
-                Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Section::make()
-                            ->schema([
-                                // User
-                                Placeholder::make('user')
-                                    ->label('Nama')
-                                    ->content(fn ($record) => $record->user?->name)
-                                    ->columnSpan([
-                                        'md' => 3,
-                                    ]),
-        
-                                // Nama Pemakaian
-                                Placeholder::make('nama_pemakaian')
-                                    ->label('Deskripsi')
-                                    ->content(fn ($record) =>$record->nama_pemakaian)
-                                    ->columnSpan([
-                                        'md' => 4,
-                                    ]),
-        
-                                // Status
-                                Placeholder::make('status')
-                                    ->label('Status')
-                                    ->content(fn ($record) => match (strtolower($record->status?->nama_status)) {
-                                        'diajukan' => '✨ Diajukan',
-                                        'direkap' => '📄 Direkap',
-                                        'disetujui' => '✅ Disetujui',
-                                        'ditolak' => '❌ Ditolak',
-                                        default => 'Tidak diketahui',
-                                    }),
-                            ])
-                                ->columns([
-                                    'md' => 10]),
-
-                        Forms\Components\Section::make('Daftar Barang Persediaan')
-                            ->schema([
-                                //Detail Pemakaian
-                                Repeater::make('detail_pemakaian')
-                                    ->relationship()
-                                    ->schema([
-                                        Select::make('referensi_id')
-                                            ->label('Referensi')
-                                            ->options(function () {
-                                                return \App\Models\Referensi::all()
-                                                    ->mapWithKeys(function ($ref) {
-                                                        $label = $ref->nama_barang . ' (' . $ref->satuan->nama_satuan . ')';
-                                                        return [$ref->id => $label];
-                                                    });
-                                            })
-                                            ->disabled()
-                                            ->required()
-                                            ->columnSpan([
-                                                    'md' => 2,
-                                                ]),
-                                        TextInput::make('volume')
-                                            ->numeric()
-                                            ->columnSpan([
-                                                'md' => 1,
-                                            ])
-                                            ->disabled()
-                                            ->default(1),                              
-                                    ])
-                                    ->columns([
-                                        'md' => 3])
-                                    ->hiddenLabel()
-                                    ->addable(false)
-                                    ->deletable(false),
-                                    ]),
-
-                    ])
-                    ->visible(fn () => auth()->user()?->role !== 'pegawai'),
             ])
             ->columns('full');
     }
@@ -229,8 +190,10 @@ class PemakaianResource extends Resource
                     })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => auth()->id() === $record->user_id),
+                Tables\Actions\ViewAction::make()
+                    ->visible(fn ($record) => auth()->id() !== $record->user_id),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

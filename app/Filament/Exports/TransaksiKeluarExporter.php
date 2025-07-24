@@ -16,16 +16,14 @@ class TransaksiKeluarExporter extends Exporter
         return [
             ExportColumn::make('id')
                 ->label('No.'),
-            
             ExportColumn::make('referensi.nama_barang')
                 ->label('Nama Barang'),
-            
+            ExportColumn::make('referensi.satuan.nama_satuan')
+                ->label('Satuan'),
             ExportColumn::make('volume')
                 ->label('Volume'),
-            
             ExportColumn::make('user.name')
                 ->label('Nama'),
-
             ExportColumn::make('created_at')
                 ->label('Tanggal')
                 ->formatStateUsing(fn ($state) => $state->format('d M Y')),

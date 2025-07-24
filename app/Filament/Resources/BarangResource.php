@@ -32,6 +32,11 @@ class BarangResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'super-admin';
+    }
+
     public static function form(Form $form): Form
     {
         return $form

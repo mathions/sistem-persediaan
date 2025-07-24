@@ -89,7 +89,6 @@ class EditPemakaian extends EditRecord
                 return redirect(\App\Filament\Resources\PemakaianResource::getUrl('index'));
             }),
 
-
             // Tolak hanya untuk user yang bukan pegawai
             Actions\Action::make('Tolak')
                 ->color('danger')
@@ -109,7 +108,8 @@ class EditPemakaian extends EditRecord
 
                     return redirect(PemakaianResource::getUrl('index'));
                 }),
-        ];
+        
+            ];
     }
 
     protected function getRedirectUrl(): string

@@ -17,10 +17,12 @@ class ManageTransaksiKeluars extends ManageRecords
             Actions\ExportAction::make()
                 ->exporter(TransaksiKeluarExporter::class)
                 ->icon('heroicon-o-arrow-down-tray')
-                ->label('Ekspor'),
+                ->label('Ekspor')
+                ->visible(fn () => auth()->user()?->role !== 'pegawai'),
             Actions\CreateAction::make()
                 ->icon('heroicon-o-plus')
-                ->label('Tambah'),
+                ->label('Tambah')
+                ->visible(fn () => auth()->user()?->role !== 'pegawai'),
         ];
     }
 }

@@ -15,13 +15,22 @@ class TransaksiMasukExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
-            ExportColumn::make('barang_id'),
-            ExportColumn::make('satuan_id'),
-            ExportColumn::make('jumlah'),
-            ExportColumn::make('user_id'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
+                ->label('No.'),
+            ExportColumn::make('referensi.nama_barang')
+                ->label('Nama Barang'),
+            ExportColumn::make('referensi.satuan.nama_satuan')
+                ->label('Satuan'),
+            ExportColumn::make('harga_beli')
+                ->label('Harga Beli'),
+            ExportColumn::make('volume')
+                ->label('Volume'),
+            ExportColumn::make('total')
+                ->label('Total'),
+            ExportColumn::make('keterangan')
+                ->label('Keterangan'),
+            ExportColumn::make('created_at')
+                ->label('Tanggal')
+                ->formatStateUsing(fn ($state) => $state->format('d M Y')),
         ];
     }
 
